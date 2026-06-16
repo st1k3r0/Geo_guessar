@@ -8,7 +8,7 @@
   :root{
     --bg:#0e1116; --panel:#171c24; --panel2:#1f2630; --line:#2a3340;
     --accent:#4ade80; --accent2:#22c55e; --text:#e6edf3; --muted:#8b97a7;
-    --gold:#fbbf24; --danger:#f87171;
+    --gold:#fbbf24; --danger:#f87171; --pink:#fb7185;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -22,11 +22,11 @@
     overflow-y:auto;padding:30px 16px}
   .logo{font-size:clamp(34px,6vw,64px);font-weight:800;letter-spacing:-1px;text-align:center}
   .logo span{color:var(--accent)}
-  .subtitle{color:var(--muted);margin-top:10px;text-align:center;max-width:560px;line-height:1.5}
+  .subtitle{color:var(--muted);margin-top:10px;text-align:center;max-width:600px;line-height:1.5}
   .play-btn{margin-top:34px;background:linear-gradient(180deg,var(--accent),var(--accent2));color:#06210f;font-size:22px;font-weight:800;padding:16px 56px;border-radius:14px;box-shadow:0 10px 30px rgba(34,197,94,.35);transition:transform .12s,box-shadow .12s}
   .play-btn:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(34,197,94,.5)}
   .play-btn:active{transform:translateY(0)}
-  .poolinfo{margin-top:14px;color:var(--accent);font-size:13px;font-weight:600}
+  .poolinfo{margin-top:14px;color:var(--accent);font-size:13px;font-weight:600;text-align:center}
   .section-title{margin:36px 0 16px;color:var(--muted);font-size:14px;letter-spacing:2px;text-transform:uppercase}
   .modes{display:grid;grid-template-columns:repeat(3,minmax(190px,240px));gap:16px;width:100%;max-width:820px}
   @media(max-width:720px){.modes{grid-template-columns:1fr}}
@@ -40,18 +40,25 @@
   .mode-card.selected .check{opacity:1}
   .rounds-row{margin-top:26px;display:flex;align-items:center;gap:12px;color:var(--muted)}
   .rounds-row select{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
-  .key-bar{margin-top:30px;width:100%;max-width:820px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
-  .key-bar h4{font-size:14px;margin-bottom:8px}
-  .key-bar p{color:var(--muted);font-size:12.5px;line-height:1.55;margin-bottom:10px}
-  .key-bar a{color:var(--accent)}
+  .panel-box{margin-top:22px;width:100%;max-width:820px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .panel-box h4{font-size:14px;margin-bottom:8px}
+  .panel-box p{color:var(--muted);font-size:12.5px;line-height:1.55;margin-bottom:10px}
+  .panel-box a{color:var(--accent)}
   .key-row{display:flex;gap:10px}
   .key-row input{flex:1;background:#0c0f14;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:10px 12px;font-size:14px}
   .key-row button{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:10px 18px;border-radius:8px}
   .key-status{font-size:12.5px;margin-top:8px}
   .ok{color:var(--accent)} .warn{color:var(--gold)}
-  .scanbtn{margin-top:12px;width:100%;background:var(--panel2);border:1px solid var(--accent);color:var(--accent);font-weight:700;padding:11px;border-radius:9px;font-size:14px}
+  .scanbtn{margin-top:12px;width:100%;background:var(--panel2);border:1px solid var(--accent);color:var(--accent);font-weight:700;padding:12px;border-radius:9px;font-size:14px}
   .scanbtn:hover{background:#1a2c20}
   .reset{margin-top:8px;background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer}
+  .support{border-color:#3a2330;background:linear-gradient(180deg,#1c1419,#171015)}
+  .support h4{color:var(--pink)}
+  .req-row{display:flex;gap:10px;align-items:center;margin-top:6px}
+  .req-num{flex:1;font-size:18px;font-weight:800;letter-spacing:1px;font-family:'Consolas',monospace;background:#0c0f14;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .req-row button{background:var(--pink);color:#2a0a14;font-weight:800;padding:10px 16px;border-radius:8px}
+  .req-bank{color:var(--muted);font-size:12.5px;margin-top:6px}
+  .adminonly{}
 
   #game{background:#000}
   #pano{position:absolute;inset:0}
@@ -97,7 +104,7 @@
 
 <div id="home" class="screen">
   <div class="logo">Гео<span>Георгиевск</span></div>
-  <div class="subtitle">Тебя забрасывает в случайную точку города Георгиевск (Ставропольский край). Осмотрись по панораме и угадай, где ты находишься, поставив метку на карте.</div>
+  <div class="subtitle">Тебя забрасывает в случайную точку Георгиевска и окрестных сёл — Краснокумское, Незлобная, Шаумянский. Осмотрись по панораме и угадай, где ты находишься, поставив метку на карте.</div>
   <button class="play-btn" id="playBtn">▶ Играть</button>
   <div class="poolinfo" id="poolInfo">Точек спавна сейчас: 0</div>
 
@@ -129,18 +136,30 @@
     </select>
   </div>
 
-  <div class="key-bar">
-    <h4>Ключ Яндекс.Карт и точки спавна</h4>
-    <p>Панорамы берутся из Яндекс.Панорам. Нужен бесплатный ключ типа «JavaScript API» из
-       <a href="https://developer.tech.yandex.ru/services/" target="_blank" rel="noopener">кабинета разработчика Яндекса</a>.
-       Каждая точка спавна = одна найденная панорама, а проверка = 1 запрос. У бесплатного тарифа лимит ~100 запросов в сутки, поэтому набирай точки постепенно: жми «Добавить точек» — каждый скан дописывает новые места к уже найденным.</p>
+  <!-- Эта панель нужна только тебе (автору) для набора точек. Гости её не видят, если ключ вшит. -->
+  <div class="panel-box adminonly" id="adminPanel">
+    <h4>Ключ Яндекс.Карт и набор точек спавна (панель автора)</h4>
+    <p>Ключ можно вшить прямо в файл (см. BAKED_KEY в коде) — тогда гостям вводить ничего не нужно.
+       Кнопка ниже ищет до ~100 новых точек по Георгиевску и сёлам и дописывает их к уже найденным.
+       Когда наберёшь 100+ точек — выгрузи их командой в консоли (F12):
+       <b>copy(localStorage.getItem('ya_pool_georgievsk_v4'))</b> — и вставь автору в код в BAKED_POOL.</p>
     <div class="key-row">
-      <input id="keyInput" type="text" placeholder="Вставь сюда свой API-ключ Яндекса…" />
+      <input id="keyInput" type="text" placeholder="API-ключ Яндекса (если не вшит в файл)…" />
       <button id="keySave">Сохранить</button>
     </div>
     <div class="key-status" id="keyStatus"></div>
-    <button class="scanbtn" id="scanMoreBtn">➕ Добавить точек спавна (скан города, ~90 запросов)</button>
-    <button class="reset" id="resetBtn">сбросить все точки и начать набор заново</button>
+    <button class="scanbtn" id="scanMoreBtn">➕ Добавить ~100 точек спавна (большой скан)</button>
+    <button class="reset" id="resetBtn">сбросить локально добавленные точки</button>
+  </div>
+
+  <div class="panel-box support">
+    <h4>❤️ Поддержать автора</h4>
+    <p>Если игра понравилась — можешь закинуть автору на чай. Спасибо!</p>
+    <div class="req-row">
+      <span class="req-num" id="reqNum">2200701351186561</span>
+      <button id="copyReq">Скопировать</button>
+    </div>
+    <div class="req-bank">Тбанк</div>
   </div>
 </div>
 
@@ -184,18 +203,37 @@
 (function(){
   "use strict";
 
-  var CENTER = [44.1519, 43.4697];
+  /* =====================================================================
+     НАСТРОЙКИ АВТОРА — заполняются один раз, чтобы гостям ничего не вводить.
+     1) BAKED_KEY  — вставь сюда свой ключ Яндекса (он публичный, защищается
+                     ограничением по домену в кабинете: HTTP Referer = твой домен).
+     2) BAKED_POOL — сюда вставь готовый список точек (см. инструкцию ниже),
+                     тогда у каждого гостя они будут сразу, без сканирования.
+     Как получить BAKED_POOL: набери точки кнопкой «Добавить точек», потом в
+     консоли (F12) выполни:  copy(localStorage.getItem('ya_pool_georgievsk_v4'))
+     и вставь скопированный массив между квадратными скобками ниже.
+  ===================================================================== */
+  var BAKED_KEY  = 'ef336a5b-ab62-4406-a3e5-b0a61e6720a5';
+  var BAKED_POOL = [
+    /* сюда вставить точки, например: [44.1519,43.4697],[44.1530,43.4710], ... */
+  ];
+
+  var CENTER = [44.155, 43.500];
+  var MAP_ZOOM = 11;
   var MODE_LABELS = { move:"🚶 Перемещение", rotate:"🔄 Только обзор", static:"📷 Стоп-кадр" };
 
-  var POOL_KEY = 'ya_pool_georgievsk_v3';
-  // whole city; dense grid scanned in random order, accumulated across runs
-  var SCAN = { latMin:44.120, latMax:44.185, lonMin:43.435, lonMax:43.515 };
-  var STEP_LAT = 0.0011;   // ~122 m
-  var STEP_LON = 0.0014;   // ~112 m
-  var RUN_BUDGET = 90;     // requests per scan (stay under ~100/day free limit)
+  var POOL_KEY = 'ya_pool_georgievsk_v4';
+  var REGIONS = [
+    { name:'Георгиевск',     latMin:44.120, latMax:44.185, lonMin:43.435, lonMax:43.515 },
+    { name:'Краснокумское',  latMin:44.150, latMax:44.200, lonMin:43.488, lonMax:43.548 },
+    { name:'Незлобная',      latMin:44.102, latMax:44.152, lonMin:43.522, lonMax:43.585 },
+    { name:'Шаумянский',     latMin:44.186, latMax:44.236, lonMin:43.415, lonMax:43.480 }
+  ];
+  var STEP_LAT = 0.0011, STEP_LON = 0.0014;
+  var RUN_BUDGET = 300, ADD_TARGET = 100;
 
   var S = {
-    key: localStorage.getItem('ya_key') || '',
+    key: localStorage.getItem('ya_key') || BAKED_KEY || '',
     mode:'move', rounds:5, round:0, score:0,
     apiLoaded:false, player:null, pool:[],
     truePos:null, guessPos:null, guessMap:null, guessMark:null,
@@ -216,14 +254,30 @@
   }
   function scoreFor(distM){ return Math.max(0, Math.round(5000*Math.exp(-distM/700))); }
 
-  function loadPool(){ try{ return JSON.parse(localStorage.getItem(POOL_KEY)||'[]')||[]; }catch(e){ return []; } }
-  function savePool(p){ try{ localStorage.setItem(POOL_KEY, JSON.stringify(p)); }catch(e){} }
-  function updatePoolInfo(){ var n=loadPool().length; $('poolInfo').textContent='Точек спавна сейчас: '+n+(n<30?'  — мало, нажми «Добавить точек»':''); }
+  // Pool = вшитые точки (BAKED_POOL) + локально добавленные сканом, без дублей
+  function loadPool(){
+    var local=[]; try{ local=JSON.parse(localStorage.getItem(POOL_KEY)||'[]')||[]; }catch(e){}
+    var merged=[], seen={};
+    function add(arr){
+      if(!arr) return;
+      for(var i=0;i<arr.length;i++){
+        var p=arr[i];
+        if(p && p.length>=2 && typeof p[0]==='number'){
+          var k=p[0].toFixed(4)+','+p[1].toFixed(4);
+          if(!seen[k]){ seen[k]=1; merged.push([p[0],p[1]]); }
+        }
+      }
+    }
+    add(BAKED_POOL); add(local);
+    return merged;
+  }
+  function saveLocalPool(p){ try{ localStorage.setItem(POOL_KEY, JSON.stringify(p)); }catch(e){} }
+  function updatePoolInfo(){ var n=loadPool().length; $('poolInfo').textContent='Точек спавна сейчас: '+n+(n<30?'  — мало':''); }
 
   function refreshKeyStatus(){
     var el=$('keyStatus');
-    if(S.key){ el.innerHTML='<span class="ok">✔ Ключ сохранён. Можно играть.</span>'; $('keyInput').value=S.key; }
-    else{ el.innerHTML='<span class="warn">⚠ Ключ не задан — панорамы не загрузятся, пока не вставишь ключ.</span>'; }
+    if(S.key){ el.innerHTML='<span class="ok">✔ Ключ задан. Можно играть.</span>'; if(!localStorage.getItem('ya_key')) {} else $('keyInput').value=S.key; }
+    else{ el.innerHTML='<span class="warn">⚠ Ключ не задан.</span>'; }
   }
   $('keySave').addEventListener('click',function(){
     var v=$('keyInput').value.trim();
@@ -232,7 +286,14 @@
   });
   $('resetBtn').addEventListener('click',function(){
     try{ localStorage.removeItem(POOL_KEY); }catch(e){}
-    S.pool=[]; updatePoolInfo(); toast('Все точки сброшены. Нажми «Добавить точек», чтобы набрать заново.');
+    updatePoolInfo(); toast('Локально добавленные точки сброшены (вшитые остаются).');
+  });
+  $('copyReq').addEventListener('click',function(){
+    var num=$('reqNum').textContent;
+    function done(){ toast('Номер карты скопирован: '+num); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(num).then(done)['catch'](function(){ done(); });
+    } else { done(); }
   });
 
   var cards=document.querySelectorAll('.mode-card');
@@ -263,36 +324,40 @@
 
   function gridPoints(){
     var pts=[];
-    for(var la=SCAN.latMin; la<=SCAN.latMax; la+=STEP_LAT)
-      for(var lo=SCAN.lonMin; lo<=SCAN.lonMax; lo+=STEP_LON)
-        pts.push([la,lo]);
+    for(var ri=0; ri<REGIONS.length; ri++){
+      var R=REGIONS[ri];
+      for(var la=R.latMin; la<=R.latMax; la+=STEP_LAT)
+        for(var lo=R.lonMin; lo<=R.lonMax; lo+=STEP_LON)
+          pts.push([la,lo]);
+    }
     for(var k=pts.length-1;k>0;k--){ var m=Math.floor(Math.random()*(k+1)); var t=pts[k]; pts[k]=pts[m]; pts[m]=t; }
     return pts;
   }
 
-  // One budgeted scan; merges new panorama points into the saved pool.
-  function scan(budget){
+  function scan(budget, addTarget){
     return loadYandex().then(function(){
-      var pool=loadPool(), seen={};
-      for(var a=0;a<pool.length;a++){ seen[pool[a][0].toFixed(4)+','+pool[a][1].toFixed(4)]=1; }
+      var local=[]; try{ local=JSON.parse(localStorage.getItem(POOL_KEY)||'[]')||[]; }catch(e){}
+      var seen={};
+      var base=loadPool();
+      for(var b=0;b<base.length;b++){ seen[base[b][0].toFixed(4)+','+base[b][1].toFixed(4)]=1; }
       var pts=gridPoints();
-      var idx=0, reqs=0, rejects=0, added=0, CONC=5, stop=false;
+      var idx=0, reqs=0, rejects=0, added=0, CONC=6, stop=false;
 
       function worker(){
         return new Promise(function(res){
           function step(){
-            if(stop || idx>=pts.length || reqs>=budget){ res(); return; }
+            if(stop || idx>=pts.length || reqs>=budget || added>=addTarget){ res(); return; }
             var p=pts[idx++]; reqs++;
             ymaps.panorama.locate(p).then(function(r){
               if(r && r.length){
                 var pos=null; try{ pos=r[0].getPosition(); }catch(e){}
                 var use = posLooksGeo(pos) ? [pos[0],pos[1]] : p;
                 var key=use[0].toFixed(4)+','+use[1].toFixed(4);
-                if(!seen[key]){ seen[key]=1; pool.push(use); added++; }
+                if(!seen[key]){ seen[key]=1; local.push(use); added++; }
               }
             })['catch'](function(){ rejects++; }).then(function(){
-              $('loaderText').textContent='Сканируем город… запросов: '+reqs+'/'+budget+' · всего точек: '+pool.length;
-              if(rejects>=10){ stop=true; }
+              $('loaderText').textContent='Сканируем Георгиевск и сёла… запросов: '+reqs+' · новых: '+added+' · всего: '+(base.length+added);
+              if(rejects>=12){ stop=true; }
               step();
             });
           }
@@ -301,8 +366,8 @@
       }
       var ws=[]; for(var w=0;w<CONC;w++) ws.push(worker());
       return Promise.all(ws).then(function(){
-        savePool(pool);
-        return { pool:pool, added:added, reqs:reqs, rejects:rejects };
+        saveLocalPool(local);
+        return { pool:loadPool(), added:added, reqs:reqs, rejects:rejects };
       });
     });
   }
@@ -312,15 +377,15 @@
     if(!S.key){ toast('Сначала вставь API-ключ Яндекса', true); return; }
     S.scanning=true;
     $('loader').classList.remove('hidden');
-    $('loaderText').textContent='Готовим скан города…';
-    scan(RUN_BUDGET).then(function(res){
+    $('loaderText').textContent='Готовим большой скан…';
+    scan(RUN_BUDGET, ADD_TARGET).then(function(res){
       S.pool=res.pool; S.scanning=false;
       $('loader').classList.add('hidden'); updatePoolInfo();
       if(res.added===0 && res.rejects>0){
-        toast('Новых точек не добавлено, запросы отклонены ('+res.rejects+'). Похоже, дневной лимит ~100 исчерпан — попробуй завтра.', true);
+        toast('Новых точек не добавлено, запросы отклонены ('+res.rejects+'). Похоже, дневной лимит ~100 исчерпан — продолжи завтра.', true);
       } else {
         var msg='Добавлено новых точек: '+res.added+'. Всего: '+res.pool.length+'.';
-        if(res.rejects>0){ msg+=' Часть запросов отклонена ('+res.rejects+') — возможно, упёрся в дневной лимит.'; }
+        if(res.rejects>0){ msg+=' Часть запросов отклонена ('+res.rejects+') — упёрся в дневной лимит.'; }
         toast(msg);
       }
     })['catch'](function(e){ S.scanning=false; $('loader').classList.add('hidden'); toast((e&&e.message)||'Ошибка скана', true); });
@@ -338,7 +403,7 @@
 
   function initGuessMap(){
     $('guessmap').innerHTML='';
-    S.guessMap=new ymaps.Map('guessmap',{center:CENTER,zoom:12,controls:['zoomControl']},{suppressMapOpenBlock:true});
+    S.guessMap=new ymaps.Map('guessmap',{center:CENTER,zoom:MAP_ZOOM,controls:['zoomControl']},{suppressMapOpenBlock:true});
     S.guessMark=null; S.guessPos=null;
     $('guessBtn').disabled=true; $('guessBtn').textContent='Поставь метку на карте';
     S.guessMap.events.add('click',function(e){
@@ -354,7 +419,7 @@
   }
 
   function startGame(){
-    if(!S.key){ toast('Сначала вставь API-ключ Яндекса внизу страницы', true); return; }
+    if(!S.key){ toast('Ключ не задан (вшей BAKED_KEY или введи в панели автора)', true); return; }
     S.round=0; S.score=0;
     $('scoreNum').textContent='0';
     $('roundTotal').textContent=S.rounds;
@@ -367,8 +432,8 @@
       initGuessMap();
       S.pool=loadPool();
       if(S.pool.length) return {pool:S.pool, added:0, reqs:0, rejects:0};
-      $('loaderText').textContent='Первый скан города (ищем панорамы)…';
-      return scan(RUN_BUDGET);
+      $('loaderText').textContent='Первый скан (ищем панорамы)…';
+      return scan(RUN_BUDGET, ADD_TARGET);
     }).then(function(res){
       S.pool=res.pool || S.pool;
       if(S.pool && S.pool.length){ updatePoolInfo(); nextRound(); return; }
@@ -422,7 +487,7 @@
     $('result').classList.remove('hidden');
     $('resultmap').classList.remove('hidden');
     $('resultmap').innerHTML='';
-    var rmap=new ymaps.Map('resultmap',{center:CENTER,zoom:12,controls:['zoomControl']},{suppressMapOpenBlock:true});
+    var rmap=new ymaps.Map('resultmap',{center:CENTER,zoom:MAP_ZOOM,controls:['zoomControl']},{suppressMapOpenBlock:true});
     var real=new ymaps.Placemark(S.truePos,{hintContent:'Где ты был'},{preset:'islands#redDotIcon'});
     var guess=new ymaps.Placemark(S.guessPos,{hintContent:'Твоя метка'},{preset:'islands#greenDotIcon'});
     var line=new ymaps.Polyline([S.truePos,S.guessPos],{},{strokeColor:'#fbbf24',strokeWidth:3,strokeStyle:'shortdash'});
@@ -487,6 +552,11 @@
       setTimeout(function(){ if(S.guessMap) S.guessMap.container.fitToViewport(); },220);
     }
   });
+
+  // Если ключ и точки вшиты — прячем панель автора от гостей.
+  if(BAKED_KEY && BAKED_POOL && BAKED_POOL.length>0){
+    var ap=$('adminPanel'); if(ap) ap.classList.add('hidden');
+  }
 
   refreshKeyStatus();
   updatePoolInfo();
