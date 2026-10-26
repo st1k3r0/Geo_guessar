@@ -28,9 +28,10 @@
   .play-btn:active{transform:translateY(0)}
   .poolinfo{margin-top:14px;color:var(--accent);font-size:13px;font-weight:600;text-align:center}
   .section-title{margin:36px 0 16px;color:var(--muted);font-size:14px;letter-spacing:2px;text-transform:uppercase}
-  .modes{display:grid;grid-template-columns:repeat(3,minmax(190px,240px));gap:16px;width:100%;max-width:820px}
-  @media(max-width:720px){.modes{grid-template-columns:1fr}}
-  .mode-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;transition:border-color .15s,transform .15s,background .15s;text-align:left;position:relative}
+  .modes{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:16px;width:100%;max-width:1000px}
+  @media(max-width:900px){.modes{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.modes{grid-template-columns:1fr}}
+  .mode-card{color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;transition:border-color .15s,transform .15s,background .15s;text-align:left;position:relative}
   .mode-card:hover{transform:translateY(-3px);border-color:var(--accent)}
   .mode-card.selected{border-color:var(--accent);background:var(--panel2);box-shadow:0 0 0 2px rgba(74,222,128,.25) inset}
   .mode-ico{font-size:30px}
@@ -52,12 +53,12 @@
   .scanbtn{margin-top:12px;width:100%;background:var(--panel2);border:1px solid var(--accent);color:var(--accent);font-weight:700;padding:12px;border-radius:9px;font-size:14px}
   .scanbtn:hover{background:#1a2c20}
   .reset{margin-top:8px;background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer}
-  .support{border-color:#3a2330;background:linear-gradient(180deg,#1c1419,#171015)}
-  .support h4{color:var(--pink)}
-  .req-row{display:flex;gap:10px;align-items:center;margin-top:6px}
-  .req-num{flex:1;font-size:18px;font-weight:800;letter-spacing:1px;font-family:'Consolas',monospace;background:#0c0f14;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
-  .req-row button{background:var(--pink);color:#2a0a14;font-weight:800;padding:10px 16px;border-radius:8px}
-  .req-bank{color:var(--muted);font-size:12.5px;margin-top:6px}
+  .place{margin-top:16px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .place-tag{color:var(--accent);font-size:11.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+  .place-name{font-size:19px;font-weight:800;margin-top:4px}
+  .place-addr{color:var(--muted);font-size:13px;margin-top:2px}
+  .place-facts{font-size:14px;line-height:1.55;margin-top:8px}
+  .result-card{max-height:96vh;overflow-y:auto}
 
   #game{background:#000}
   #pano{position:absolute;inset:0}
@@ -124,6 +125,11 @@
       <div class="mode-name">Стоп-кадр</div>
       <div class="mode-desc">Нельзя ни ходить, ни вращать камеру. Один застывший вид — самый сложный режим.</div>
     </button>
+    <button class="mode-card" data-mode="kraeved">
+      <span class="check">✔</span><div class="mode-ico">🏛</div>
+      <div class="mode-name">Краеведческий</div>
+      <div class="mode-desc">Тебя забрасывает к главным местам Георгиевска, а после каждого раунда открывается карточка с историей места.</div>
+    </button>
   </div>
 
   <div class="rounds-row">
@@ -149,15 +155,6 @@
     <button class="reset" id="resetBtn">сбросить локально добавленные точки</button>
   </div>
 
-  <div class="panel-box support">
-    <h4>❤️ Поддержать автора</h4>
-    <p>Если игра понравилась — можешь закинуть автору на чай. Спасибо!</p>
-    <div class="req-row">
-      <span class="req-num" id="reqNum">2200701351186561</span>
-      <button id="copyReq">Скопировать</button>
-    </div>
-    <div class="req-bank">Тбанк</div>
-  </div>
 </div>
 
 <div id="game" class="screen hidden">
@@ -205,7 +202,52 @@
 
   var CENTER = [44.155, 43.500];
   var MAP_ZOOM = 11;
-  var MODE_LABELS = { move:"🚶 Перемещение", rotate:"🔄 Только обзор", static:"📷 Стоп-кадр" };
+  var MODE_LABELS = { move:"🚶 Перемещение", rotate:"🔄 Только обзор", static:"📷 Стоп-кадр", kraeved:"🏛 Краеведческий" };
+
+  // Краеведческий режим: значимые места Георгиевска. ll — координаты [широта, долгота];
+  // geo — адрес для уточнения точки через геокодер Яндекса (если задан).
+  var PLACES = [
+    { name:'Стела в честь 200-летия Георгиевского трактата', addr:'перекрёсток улиц Октябрьской и Горийской', ll:[44.147689,43.477351],
+      facts:'24 июля (4 августа) 1783 года в Георгиевской крепости был подписан договор, по которому Восточная Грузия перешла под покровительство России. Стела установлена в 1983 году, к 200-летию трактата.' },
+    { name:'Никольская церковь', addr:'ул. Красноармейская, 17', ll:[44.143859,43.480597],
+      facts:'Деревянный храм XVIII века: казаки привезли его с Хопра в разобранном виде и в 1780 году собрали в Георгиевской крепости. Старейшая православная церковь края, не разрушенная в 1930-х годах.' },
+    { name:'Собор Святого Георгия', addr:'ул. Строителей, 2', ll:[44.138044,43.454451],
+      facts:'Строился с 2001 по 2017 год. Главный (кафедральный) собор Георгиевской епархии, образованной в 2012 году.' },
+    { name:'Монумент Георгию Победоносцу', addr:'площадь Победы', ll:[44.1508,43.4728], geo:'Ставропольский край, Георгиевск, площадь Победы, 1',
+      facts:'Конная фигура всадника, пронзающего змея, открыта в 2017 году на центральной площади. Святой Георгий — покровитель города, давший ему имя.' },
+    { name:'Центральный парк культуры и отдыха', addr:'ул. Октябрьская — ул. Гагарина', ll:[44.155869,43.470638],
+      facts:'Один из старейших парков юга России — бывший городской сад уездного Георгиевска. Здесь есть колесо обозрения и старинный фонтан.' },
+    { name:'Историко-краеведческий музей', addr:'ул. Лермонтова, 78/103', ll:[44.154112,43.474563],
+      facts:'Музей открыт в 1967 году как народный и разместился в особняке Дора — памятнике архитектуры начала XX века. Современная экспозиция создана в 2010 году.' },
+    { name:'Железнодорожный вокзал', addr:'Привокзальная площадь, ул. Бойко', ll:[44.1668,43.4783],
+      facts:'Здание вокзала — памятник архитектуры начала XX века. Станция Георгиевск — узловая станция Северо-Кавказской железной дороги.' },
+    { name:'Памятник М. Ю. Лермонтову', addr:'аллея имени Лермонтова', ll:[44.1536,43.4750], geo:'Ставропольский край, Георгиевск, улица Лермонтова, 78',
+      facts:'Открыт в 2020 году. В детстве, в 1820 и 1825 годах, Лермонтов вместе с бабушкой останавливался в Георгиевске по пути к Горячим Водам.' },
+    { name:'Дом наместника Кавказа', addr:'ул. Красноармейская, 11', ll:[44.1442,43.4799], geo:'Ставропольский край, Георгиевск, Красноармейская улица, 11',
+      facts:'С 1786 года Георгиевск был городом Кавказского наместничества: здесь жил наместник и размещался штаб командующего Кавказской линией. С этим домом связывают подписание Георгиевского трактата.' },
+    { name:'Мемориал «Вечный огонь»', addr:'Привокзальная площадь, ул. Бойко', ll:[44.166582,43.478773],
+      facts:'Возведён в 1949 году на месте братской могилы советских воинов. Георгиевск был оккупирован 9 августа 1942 года и освобождён 10 января 1943 года.' },
+    { name:'Георгиевская крепость', addr:'Шоссейная улица', ll:[44.144167,43.485000],
+      facts:'Крепость № 4 Азово-Моздокской линии, заложенная в 1777 году. До наших дней сохранились часть крепостной стены и здания пороховых складов.' },
+    { name:'Особняк Соболевых', addr:'ул. Октябрьская, 35', ll:[44.145637,43.478316],
+      facts:'Особняк начала XX века в стиле раннего модерна. Соболевы — семья аптекаря, который в 1805 году заложил в Георгиевске Аптекарский (Ботанический) сад.' },
+    { name:'Здание Азово-Черноморского коммерческого банка', addr:'ул. Октябрьская, 62', ll:[44.150493,43.475144],
+      facts:'В 1871 году здесь открылось отделение Азово-Донского коммерческого банка. С 1990 года в здании работает городской ЗАГС.' },
+    { name:'Особняк купца Тарасенко', addr:'ул. Ленина, 118', ll:[44.150132,43.471219],
+      facts:'Памятник архитектуры в центре города. В 1950–1960-х годах здесь работали горком и райком комсомола.' },
+    { name:'Народный дом', addr:'ул. Луначарского, 41', ll:[44.149827,43.476698],
+      facts:'Здание конца XIX века. В 1920-х здесь был Народный дом, в 1941 году — курсы связисток, а с 1961 года работает Народный драматический театр.' }
+  ];
+  function viewMode(){ return S.mode==='kraeved' ? 'move' : S.mode; }
+  function shuffled(arr){ var a=arr.slice(); for(var k=a.length-1;k>0;k--){ var m=Math.floor(Math.random()*(k+1)); var t=a[k]; a[k]=a[m]; a[m]=t; } return a; }
+  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function placePoint(p){
+    if(!p.geo || !ymaps.geocode) return Promise.resolve(p.ll);
+    return ymaps.geocode(p.geo,{results:1}).then(function(res){
+      var o=res.geoObjects.get(0); var c=o && o.geometry && o.geometry.getCoordinates();
+      return (posLooksGeo(c) && haversine(c,p.ll)<3000) ? c : p.ll;
+    })['catch'](function(){ return p.ll; });
+  }
 
   var POOL_KEY = 'ya_pool_georgievsk_v4';
   var REGIONS = [
@@ -219,7 +261,7 @@
 
   var S = {
     key: localStorage.getItem('ya_key') || BAKED_KEY || '',
-    mode:'move', rounds:5, round:0, score:0,
+    mode:'move', rounds:5, round:0, score:0, places:[], place:null,
     apiLoaded:false, player:null, pool:[],
     truePos:null, guessPos:null, guessMap:null, guessMark:null,
     resultMap:null, locked:false, scanning:false
@@ -272,13 +314,6 @@
     try{ localStorage.removeItem(POOL_KEY); }catch(e){}
     updatePoolInfo(); toast('Локально добавленные точки сброшены (вшитые остаются).');
   });
-  $('copyReq').addEventListener('click',function(){
-    var num=$('reqNum').textContent;
-    function done(){ toast('Номер карты скопирован: '+num); }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(num).then(done)['catch'](function(){ done(); });
-    } else { done(); }
-  });
 
   var cards=document.querySelectorAll('.mode-card');
   for(var i=0;i<cards.length;i++){
@@ -288,6 +323,7 @@
     });
   }
   $('roundsSelect').addEventListener('change',function(e){ S.rounds=+e.target.value; });
+  // в краеведческом режиме 15 мест, поэтому 10 раундов — максимум (без повторов)
 
   function loadYandex(){
     return new Promise(function(resolve,reject){
@@ -375,10 +411,11 @@
 
   function buildPlayer(pano, fallbackPos){
     if(S.player){ try{S.player.destroy();}catch(e){} S.player=null; }
-    $('pano').className='mode-'+S.mode;
-    var opts={ suppressMapOpenBlock:true, controls: S.mode==='move' ? ['zoomControl'] : [], scrollZoomBehavior: S.mode!=='static' };
+    var vm=viewMode();
+    $('pano').className='mode-'+vm;
+    var opts={ suppressMapOpenBlock:true, controls: vm==='move' ? ['zoomControl'] : [], scrollZoomBehavior: vm!=='static' };
     S.player=new ymaps.panorama.Player('pano', pano, opts);
-    if(S.mode==='static'){ $('freeze').classList.remove('hidden'); } else { $('freeze').classList.add('hidden'); }
+    if(vm==='static'){ $('freeze').classList.remove('hidden'); } else { $('freeze').classList.add('hidden'); }
     var pos=null; try{ pos=pano.getPosition(); }catch(e){}
     S.truePos = posLooksGeo(pos) ? [pos[0],pos[1]] : (fallbackPos || CENTER);
   }
@@ -402,7 +439,8 @@
 
   function startGame(){
     if(!S.key){ toast('Ключ не задан', true); return; }
-    S.round=0; S.score=0;
+    S.round=0; S.score=0; S.place=null;
+    S.places = S.mode==='kraeved' ? shuffled(PLACES) : [];
     $('scoreNum').textContent='0';
     $('roundTotal').textContent=S.rounds;
     $('modeTag').textContent=MODE_LABELS[S.mode];
@@ -435,6 +473,7 @@
     $('loader').classList.remove('hidden');
     $('loaderText').textContent='Загружаем панораму…';
 
+    if(S.mode==='kraeved'){ kraevedRound(); return; }
     var tries=0, pano=null, used=null, cap=Math.min(10, Math.max(3, S.pool.length));
     function attempt(){
       if(pano){ finish(); return; }
@@ -459,6 +498,39 @@
     attempt();
   }
 
+  function kraevedRound(){
+    function done(pano, ll){
+      buildPlayer(pano, ll);
+      if(S.guessMark){ S.guessMap.geoObjects.remove(S.guessMark); S.guessMark=null; }
+      S.guessPos=null;
+      $('guessBtn').disabled=true; $('guessBtn').textContent='Поставь метку на карте';
+      $('loader').classList.add('hidden');
+    }
+    function tryNext(){
+      if(!S.places.length){
+        $('loader').classList.add('hidden');
+        toast('Не удалось загрузить панораму у достопримечательности. Попробуй ещё раз.', true);
+        S.round--; return;
+      }
+      var p=S.places.shift();
+      placePoint(p).then(function(ll){
+        return ymaps.panorama.locate(ll).then(function(r){
+          if(r && r.length){ var pos=null; try{ pos=r[0].getPosition(); }catch(e){}
+            if(!posLooksGeo(pos) || haversine(pos,ll)<600){ S.place=p; done(r[0], ll); return; } }
+          tryNext();
+        });
+      })['catch'](function(){ tryNext(); });
+    }
+    tryNext();
+  }
+
+  function placeCardHtml(p){
+    return '<div class="place"><div class="place-tag">Карточка места</div>'+
+      '<div class="place-name">'+esc(p.name)+'</div>'+
+      '<div class="place-addr">Георгиевск, '+esc(p.addr)+'</div>'+
+      '<div class="place-facts">'+esc(p.facts)+'</div></div>';
+  }
+
   function makeGuess(){
     if(!S.guessPos || S.locked || !S.truePos) return;
     S.locked=true;
@@ -480,6 +552,11 @@
     var distTxt = distM<1000 ? Math.round(distM)+' м' : (distM/1000).toFixed(2)+' км';
     $('roundScore').textContent='+'+gained;
     $('roundDist').textContent='Ошибка: '+distTxt+'  ·  из 5000 очков';
+    var oldCard=$('placeCard'); if(oldCard) oldCard.remove();
+    if(S.mode==='kraeved' && S.place){
+      var wrap=document.createElement('div'); wrap.id='placeCard'; wrap.innerHTML=placeCardHtml(S.place);
+      $('resultBody').insertBefore(wrap, $('nextBtn'));
+    }
     $('nextBtn').textContent = (S.round>=S.rounds) ? 'Итоги игры →' : 'Следующий раунд →';
   }
 
